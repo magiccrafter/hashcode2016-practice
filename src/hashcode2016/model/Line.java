@@ -17,9 +17,9 @@ public class Line implements Comparable<Line> {
         this.orientation = orientation;
         this.length = length;
         if (LineOrientation.HORIZONTAL.equals(orientation)) {
-            this.endCell = new Cell(startCell.row, startCell.row + (length - 1));
+            this.endCell = new Cell(startCell.row, startCell.col + (length - 1));
         } else {
-            this.endCell = new Cell(startCell.col, startCell.col + (length - 1));
+            this.endCell = new Cell(startCell.row + (length - 1), startCell.col);
         }
         this.uid = length + "-" + orientation + "-" + startCell.uid;
     }
