@@ -19,7 +19,7 @@ public class App {
 
     public static void main(String[] args) {
         App app = new App();
-        String fileName = "test/learn_and_teach.in";
+        String fileName = "test/logo.txt";
 
         try (Scanner scanner = new Scanner(Paths.get(fileName))) {
             String line;
