@@ -62,7 +62,7 @@ public class SquareProcessor {
             }
         }
 
-        if (sqSideSize >= 3) {
+        if (sqSideSize > 3) {
             _process(sqSideSize - 2);
         }
 
