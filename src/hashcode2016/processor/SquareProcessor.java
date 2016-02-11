@@ -1,8 +1,15 @@
 package hashcode2016.processor;
 
 import hashcode2016.Utils;
-import hashcode2016.model.*;
+import hashcode2016.command.EraseCellCommand;
+import hashcode2016.command.PaintSquareCommand;
+import hashcode2016.model.Board;
+import hashcode2016.model.Cell;
+import hashcode2016.model.Square;
+import hashcode2016.model.SquareInfo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -14,11 +21,15 @@ public class SquareProcessor {
     public final int smallerSqSideSize;
     public final Board board;
     public final Map<String, Square> squareMap;
+    public final List<PaintSquareCommand> squareCommands;
+    public final List<EraseCellCommand> eraseCellCommands;
 
 
     public SquareProcessor(Board board) {
         this.board = board;
         this.squareMap = new TreeMap<>();
+        this.squareCommands = new ArrayList<>();
+        this.eraseCellCommands = new ArrayList<>();
         this.smallerSqSideSize = (board.rowNum > board.colNum) ? board.colNum : board.rowNum;
     }
 
@@ -30,9 +41,8 @@ public class SquareProcessor {
     public void _process(int sqSideSize) {
         for (int row = 0; row <= board.rowNum - sqSideSize; row++) {
             for (int col = 0; col <= board.colNum - sqSideSize; col++) {
-                SquareInfo sqInfo = getSqEmptyCellNum(row, col, sqSideSize);
-                boolean isGoodCommand = (sqInfo.emptyCellNum < sqSideSize);
-                if (isGoodCommand) {
+                SquareInfo sqInfo = getSquareInfo(row, col, sqSideSize);
+                if (sqInfo.isGoodCommand) {
                     Square sq = new Square(new Cell(row, col), sqSideSize, sqInfo);
                     squareMap.put(sq.squareUID, sq);
                 }
@@ -46,6 +56,10 @@ public class SquareProcessor {
                 boolean squaresIntersect = (lastSq != null && squaresIntersect(lastSq, sq));
                 if (!squaresIntersect) {
                     System.out.println(sq);
+                    squareCommands.add(new PaintSquareCommand(sq));
+                    sq.squareInfo.cellsToErase.stream().forEach(cell -> {
+                        eraseCellCommands.add(new EraseCellCommand(cell));
+                    });
                     removeSquareFromBoard(sq);
                 } else {
                     intersectingSq = true;
@@ -53,16 +67,15 @@ public class SquareProcessor {
                 }
                 lastSq = sq;
             }
-//                Square sq = Utils.sortByValue(squareMap).values().stream().findFirst().get();
-//                System.out.println(sq);
-//                removeSquareFromBoard(sq);
+
             squareMap.clear();
             if (intersectingSq) {
                 _process(sqSideSize);
             }
         }
 
-        if (sqSideSize > 3) {
+        // TODO: Ugly fine tuning. we care only for huge objects
+        if (sqSideSize > 17) {
             _process(sqSideSize - 2);
         }
 
@@ -83,17 +96,25 @@ public class SquareProcessor {
         }
     }
 
-    private SquareInfo getSqEmptyCellNum(int startRow, int startCol, int sqSideSize) {
+    private SquareInfo getSquareInfo(int startRow, int startCol, int sqSideSize) {
         int emptyCellNum = 0;
+        List<Cell> cellsToErase = new ArrayList<>();
+
         for (int row = startRow; row < startRow + sqSideSize; row++) {
             for (int col = startCol; col < startCol + sqSideSize; col++) {
                 if (board.cells[row][col] == '.') {
-                    emptyCellNum++;
+                    ++emptyCellNum;
+                    cellsToErase.add(new Cell(row, col));
+                }
+
+                // TODO: move rule outside the method
+                if (emptyCellNum > 0) {
+                    return new SquareInfo(emptyCellNum, null, false);
                 }
             }
         }
 
-        return new SquareInfo(emptyCellNum);
+        return new SquareInfo(emptyCellNum, cellsToErase, true);
     }
 
     private static boolean squaresIntersect(Square sq1, Square sq2) {

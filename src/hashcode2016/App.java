@@ -1,5 +1,6 @@
 package hashcode2016;
 
+import hashcode2016.command.Command;
 import hashcode2016.model.Board;
 import hashcode2016.processor.LineProcessor;
 import hashcode2016.processor.SingleCellProcessor;
@@ -7,10 +8,12 @@ import hashcode2016.processor.SquareProcessor;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
- * Created by nasko on 09/02/2016.
+ * @author vasilevn
  */
 public class App {
 
@@ -46,23 +49,31 @@ public class App {
             e.printStackTrace();
         }
 
+        List<Command> allCommands = new ArrayList<>();
+
         app.board.prettyPrint();
 
         // Processing / Computation
         SquareProcessor squareProcessor = new SquareProcessor(app.board);
         squareProcessor.process();
-
+        allCommands.addAll(squareProcessor.squareCommands);
+        allCommands.addAll(squareProcessor.eraseCellCommands);
         app.board.prettyPrint();
 
         LineProcessor lineProcessor = new LineProcessor(app.board);
         lineProcessor.process();
-
+        allCommands.addAll(lineProcessor.lineCommands);
         app.board.prettyPrint();
 
         SingleCellProcessor singleCellProcessor = new SingleCellProcessor(app.board);
         singleCellProcessor.process();
-
+        allCommands.addAll(singleCellProcessor.cellCommands);
         app.board.prettyPrint();
+
+        System.out.println(allCommands.size());
+//        allCommands.stream().forEach((Command command) -> {
+//            System.out.println(command);
+//        });
     }
 
 }

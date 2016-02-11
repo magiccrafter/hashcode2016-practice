@@ -6,6 +6,7 @@ package hashcode2016.model;
 public class Line implements Comparable<Line> {
 
     public final Cell startCell;
+    public final Cell endCell;
     public final LineOrientation orientation;
     public final int length;
     public final String uid;
@@ -15,6 +16,11 @@ public class Line implements Comparable<Line> {
         this.startCell = startCell;
         this.orientation = orientation;
         this.length = length;
+        if (LineOrientation.HORIZONTAL.equals(orientation)) {
+            this.endCell = new Cell(startCell.row, startCell.row + (length - 1));
+        } else {
+            this.endCell = new Cell(startCell.col, startCell.col + (length - 1));
+        }
         this.uid = length + "-" + orientation + "-" + startCell.uid;
     }
 

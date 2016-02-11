@@ -1,11 +1,14 @@
 package hashcode2016.processor;
 
 import hashcode2016.*;
+import hashcode2016.command.PaintLineCommand;
 import hashcode2016.model.Board;
 import hashcode2016.model.Cell;
 import hashcode2016.model.Line;
 import hashcode2016.model.LineOrientation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -16,11 +19,13 @@ public class LineProcessor {
 
     public final Board board;
     public final Map<String, Line> lineMap;
+    public final List<PaintLineCommand> lineCommands;
 
 
     public LineProcessor(Board board) {
         this.board = board;
         this.lineMap = new TreeMap<>();
+        this.lineCommands = new ArrayList<>();
     }
 
     public void process() {
@@ -30,7 +35,8 @@ public class LineProcessor {
 
         if (!lineMap.isEmpty()) {
             Line line = Utils.sortByValue(lineMap).values().stream().findFirst().get();
-            System.out.println(line);
+            //System.out.println(line);
+            lineCommands.add(new PaintLineCommand(line));
             removeLineFromBoard(line);
             lineMap.clear();
             process();
