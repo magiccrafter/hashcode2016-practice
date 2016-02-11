@@ -31,20 +31,19 @@ public class SquareProcessor {
                 for (int col = 0; col <= board.colNum - sqSideSize; col++) {
                     int sqEmptyCellNum = getSqEmptyCellNum(row, col, sqSideSize);
                     boolean isGoodCommand = (sqEmptyCellNum < sqSideSize);
-                    Square sq = new Square(new Cell(row, col), sqSideSize, sqEmptyCellNum, isGoodCommand);
-                    squareMap.put(sq.squareUID, sq);
+                    if (isGoodCommand) {
+                        Square sq = new Square(new Cell(row, col), sqSideSize, sqEmptyCellNum, isGoodCommand);
+                        squareMap.put(sq.squareUID, sq);
+                    }
                 }
             }
 
             if (!squareMap.isEmpty()) {
                 Square sq = Utils.sortByValue(squareMap).values().stream().findFirst().get();
-                if (sq.isGoodCommand) {
-                    System.out.println(sq);
-                    removeSquareFromBoard(sq);
-                    squareMap.clear();
-                    process();
-                    break;
-                }
+                System.out.println(sq);
+                removeSquareFromBoard(sq);
+                squareMap.clear();
+                process();
             }
         }
 
